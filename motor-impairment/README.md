@@ -1,78 +1,43 @@
-# Pokemon Emerald Accessibility Scripts
+# Motor Impairment — One-Handed Play for Pokemon Emerald
 
-Scripts that make Pokemon Emerald playable for people with disabilities.
-
-Pokemon Emerald was released in 2005. It has no accessibility settings. Players with motor impairments, visual impairments, or cognitive differences have had no options — until now.
-
-This project builds those options.
+Part of the [pokemon-emerald-accessibility](https://github.com/RohanM1212/pokemon-emerald-accessibility) project.
 
 ---
 
 ## Who This Is For
 
-- Players with **motor impairments** (cerebral palsy, limb differences, tremors, RSI) who struggle with simultaneous button presses
-- Players with **visual impairments** who need audio cues for game state *(coming soon)*
-- Players with **cognitive differences** (ADHD, autism) who need simplified decision support in battle *(coming soon)*
+Players with motor impairments affecting one hand, including cerebral palsy, limb differences, repetitive strain injuries, and tremors. If holding B while pressing a direction is painful or impossible for you, this script is for you.
 
 ---
 
-## Current Scripts
+## What It Does
 
-### Motor Impairment — One-Handed Play
-**Folder:** `/motor-impairment/`
+Pokemon Emerald requires simultaneous button presses that are difficult or impossible for one-handed players. This script converts those into single button toggles or automatic assists so the game is fully playable with one hand.
 
-Pokemon Emerald requires holding B while pressing a direction to run. It requires rapid repeated A presses to advance dialogue. These are impossible or painful for many one-handed players.
+**Auto-Run Toggle** — press SELECT once to toggle running on or off. No need to hold B.
 
-**This script fixes that:**
-- **Auto-Run Toggle** — press SELECT once to toggle running on/off. No need to hold B.
-- **Dialogue Auto-Advance** — hold A and text advances automatically. No repeated tapping.
-- **Debug Overlay** — shows script status in the mGBA console so you always know what's active.
+**Dialogue Auto-Advance** — hold A and text advances automatically. No repeated tapping.
+
+**Debug Overlay** — shows script status in the mGBA console so you always know what's active.
 
 ---
 
 ## How To Use
 
-1. Download and install [mGBA](https://mgba.io/) (version 0.10 or later)
+1. Download and install mGBA (version 0.10 or later) at mgba.io
 2. Load your Pokemon Emerald ROM (US version)
-3. Go to **Tools → Scripting**
-4. Click **Load Script** and select the `.lua` file for the feature you want
-5. Edit the `CONFIG` block at the top of the script to turn features on or off
-
----
-
-## Coming Soon
-
-| Track | Status | What it does |
-|-------|--------|--------------|
-| Visual Impairment | Planned | Audio cues for battle state, HP levels, and map transitions |
-| Cognitive Assist | Planned | Battle move suggestions, simplified menus, attention reminders |
+3. Go to Tools, then Scripting
+4. Click Load Script and select one_handed_assist.lua
+5. Edit the CONFIG block at the top of the script to turn features on or off
 
 ---
 
 ## Testing
 
-These scripts were tested using mGBA 0.10.x with the US release of Pokemon Emerald (game code: BPEE).
-
-If you have a disability and want to test these scripts, please open an Issue or reach out. Real user feedback is what makes this project better. Your experience matters more than any amount of my own testing.
+Tested on mGBA 0.10.x with the US release of Pokemon Emerald (game code BPEE). Other regions may have different memory addresses and the script may not work correctly.
 
 ---
 
-## Contributing
+## Feedback
 
-Pull requests welcome. If you want to add support for a new disability or a new feature, open an Issue first so we can discuss the approach.
-
----
-
-## Why I Built This
-
-I've spent the last two years learning electronics and embedded systems through self-directed projects. One thing I kept coming back to was the question of who technology is built for — and who it leaves out.
-
-Disabled gamers have been asking for accessibility features in Pokemon games for years. The Pokemon Company hasn't listened. So I decided to build what they won't.
-
-This is an ongoing project. It will grow.
-
----
-
-## License
-
-MIT — free to use, modify, and share.
+If you have a motor impairment and want to test this, open an Issue or reach out directly. Real user feedback is what makes this project better. Your experience matters more than any amount of my own testing.
