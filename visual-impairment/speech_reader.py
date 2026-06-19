@@ -2,7 +2,7 @@ import pyttsx3
 import time
 import os
 
-QUEUE_FILE = r"C:\Users\rmukh\Desktop\pokemon-accessibility-dev\speech_queue.txt"
+QUEUE_FILE = rQUEUE_FILE = os.path.join(os.path.dirname(__file__), "speech_queue.txt")
 
 engine = pyttsx3.init()
 engine.setProperty('rate', 150)
