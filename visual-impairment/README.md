@@ -6,67 +6,26 @@ Part of the [pokemon-emerald-accessibility](https://github.com/RohanM1212/pokemo
 
 ## Who This Is For
 
-Players with visual impairments who can't read the screen clearly enough to play. This includes low vision, blindness, and anyone who finds the small GBA text difficult to track during fast-paced battles.
+Blind or visually impaired players who can't read the game menus or see what is happening on screen during battles.
 
 ---
 
 ## What It Does
 
-Pokemon Emerald gives you no audio feedback about what's happening in battle. You have to read everything. This script fixes that by reading the game's memory and speaking game state out loud through your computer's speakers.
+This script constantly checks the game memory every thirty frames. It looks for changes in your health points and what options you are hovering over. When something changes, it writes the text out to a file called speech_queue.txt.
 
-When a battle starts, it announces your Pokemon, their level, and their HP. When your HP drops, it tells you. When it gets critical, it warns you. When you navigate the battle menu, it reads your selection out loud.
-
-You don't have to see the screen to know what's happening.
+There is also a Python script called speech_reader.py that watches that file and reads it out loud using a text-to-speech engine. If your HP drops below twenty-five percent, it sounds a warning so you know you are about to faint. When you move up and down in the battle menu, it says FIGHT or BAG out loud before you click it.
 
 ---
 
-## How It Works
+## How To Use
 
-Two files work together:
-
-**visual_assist.lua** runs inside mGBA. It reads the game's memory every frame and writes game events to a text file.
-
-**speech_reader.py** runs in the background on your computer. It watches that text file and reads anything new out loud using text-to-speech.
-
----
-
-## Setup
-
-You need Python installed. Get it at python.org if you don't have it.
-
-Install the required library:
-
-1. Open your terminal and run speech_reader.py first
-2. Open mGBA and load Pokemon Emerald (US version)
-3. Go to Tools, then Scripting
-4. Load visual_assist.lua
-5. Start the game
-
-Your computer will start speaking game events as they happen.
-
----
-
-## What It Announces
-
-- Battle start: your Pokemon name, level, and HP
-- Enemy Pokemon name and level
-- HP changes during battle
-- Critical HP warning at 25% health
-- Pokemon fainting
-- Battle menu selection when you navigate
+You need two things running at the same time. First, load this script inside mGBA by going to Tools and then Scripting. Second, run speech_reader.py using Python on your computer. Make sure the file paths inside both files point to the same location or they won't talk to each other.
 
 ---
 
 ## Notes
 
-This was built and tested on mGBA 0.10.x with the US release of Pokemon Emerald (game code BPEE). Other regions may have different memory addresses and the script may not work correctly.
+I had to redo the memory addresses from my first version because the original ones were wrong. These are verified for the USA version of the Emerald ROM, game code BPEE.
 
-The speech output speed can be adjusted in speech_reader.py by changing the rate value. Default is 150 words per minute.
-
----
-
-## Status
-
-This is the second track in an ongoing project. Motor impairment support is complete. Cognitive assist is coming next.
-
-If you have a visual impairment and want to test this, open an Issue. Real feedback from real users matters more than anything else.
+If you have a visual impairment and want to test this, open an Issue. Real feedback is what makes this actually useful.

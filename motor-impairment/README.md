@@ -6,38 +6,26 @@ Part of the [pokemon-emerald-accessibility](https://github.com/RohanM1212/pokemo
 
 ## Who This Is For
 
-Players with motor impairments affecting one hand, including cerebral palsy, limb differences, repetitive strain injuries, and tremors. If holding B while pressing a direction is painful or impossible for you, this script is for you.
+Players who have a motor impairment affecting one hand, including things like cerebral palsy, tremors, or injuries that make holding multiple buttons at the same time impossible.
 
 ---
 
 ## What It Does
 
-Pokemon Emerald requires simultaneous button presses that are difficult or impossible for one-handed players. This script converts those into single button toggles or automatic assists so the game is fully playable with one hand.
+The main issue in Pokemon Emerald is that you have to hold the B button down the entire time you want to run. What I did here was change that into a toggle. You press SELECT once and your character keeps running until you hit it again.
 
-**Auto-Run Toggle** — press SELECT once to toggle running on or off. No need to hold B.
-
-**Dialogue Auto-Advance** — hold A and text advances automatically. No repeated tapping.
-
-**Debug Overlay** — shows script status in the mGBA console so you always know what's active.
+I also added a part that fixes dialogue. Instead of smashing the A button a million times during long talking scenes, you just hold it down and the text advances itself. It saves your wrists from getting tired.
 
 ---
 
 ## How To Use
 
-1. Download and install mGBA (version 0.10 or later) at mgba.io
-2. Load your Pokemon Emerald ROM (US version)
-3. Go to Tools, then Scripting
-4. Click Load Script and select one_handed_assist.lua
-5. Edit the CONFIG block at the top of the script to turn features on or off
+Open your mGBA emulator and load the game. Click on Tools and then Scripting. Load this script file. If you want to shut off the text helper or the run toggle, open the script in a text editor and flip the true values to false at the top.
 
 ---
 
-## Testing
+## Notes
 
-Tested on mGBA 0.10.x with the US release of Pokemon Emerald (game code BPEE). Other regions may have different memory addresses and the script may not work correctly.
+I built this using the standard US Pokemon Emerald ROM. The memory locations for checking if you are moving or talking are set for that specific version.
 
----
-
-## Feedback
-
-If you have a motor impairment and want to test this, open an Issue or reach out directly. Real user feedback is what makes this project better. Your experience matters more than any amount of my own testing.
+If you have a motor impairment and want to test this, open an Issue. Real feedback from real users is what makes this project better.
