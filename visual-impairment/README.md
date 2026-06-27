@@ -26,6 +26,6 @@ You need two things running at the same time. First, load this script inside mGB
 
 ## Notes
 
-I had to redo the memory addresses from my first version because the original ones were wrong. These are verified for the USA version of the Emerald ROM, game code BPEE.
+I had to redo the memory addresses from my first version because the original ones were wrong. These are verified for the USA/Europe version of the Emerald ROM, game code BPEE.
 
 If you have a visual impairment and want to test this, open an Issue. Real feedback is what makes this actually useful.

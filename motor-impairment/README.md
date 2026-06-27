@@ -26,6 +26,6 @@ Open your mGBA emulator and load the game. Click on Tools and then Scripting. Lo
 
 ## Notes
 
-I built this using the standard US Pokemon Emerald ROM. The memory locations for checking if you are moving or talking are set for that specific version.
+I built this using the standard USA/Europe Pokemon Emerald ROM. The memory locations for checking if you are moving or talking are set for that specific version.
 
 If you have a motor impairment and want to test this, open an Issue. Real feedback from real users is what makes this project better.

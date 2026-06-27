@@ -28,6 +28,6 @@ Open mGBA and boot up Pokemon Emerald. Go to Tools then Scripting and load this 
 
 ## Notes
 
-This works on the USA version of the ROM. The game code is BPEE. If you use a different version, the numbers I used to find the PP values in the memory won't line up and it will read random garbage.
+This works on the USA/Europe version of the ROM. The game code is BPEE. If you use a different version, the numbers I used to find the PP values in the memory won't line up and it will read random garbage.
 
 If you have a cognitive disability and want to test this, open an Issue. Real feedback is the only way to know if this actually helps.
