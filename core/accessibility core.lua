@@ -11,33 +11,41 @@
 
     fixed: every execute_action branch now explicitly returns output_keys so we
     never accidentally pass nil into a bit operation and crash the whole thing.
---]]
-
-local core = {}
+--]] local core = {}
 
 -- internal tracker for the state engine
 local state = {
-    frame_count    = 0,
-    current_states = {},   -- which named states are active right now
-    last_keys      = 0,
+    frame_count = 0,
+    current_states = {}, -- which named states are active right now
+    last_keys = 0,
 
     -- separate storage blocks per action type so they don't stomp each other
-    hp_monitor    = {},
-    hp_summary    = {},
+    hp_monitor = {},
+    hp_summary = {},
     decision_timer = {},
-    auto_run      = { toggle = false, select_was_pressed = false }
+    auto_run = {
+        toggle = false,
+        select_was_pressed = false
+    },
+    announce = {}
 }
 
-local ADDR   = {}
+local ADDR = {}
 local STATES = {}
 local CONFIG = {}
 
-local function read8(addr)  return emu:read8(addr)  or 0 end
-local function read16(addr) return emu:read16(addr) or 0 end
+local function read8(addr)
+    return emu:read8(addr) or 0
+end
+local function read16(addr)
+    return emu:read16(addr) or 0
+end
 
 local function write_to_queue(queue_name, message)
     -- nothing happens if the profile forgot to define this queue
-    if not CONFIG.queues or not CONFIG.queues[queue_name] then return end
+    if not CONFIG.queues or not CONFIG.queues[queue_name] then
+        return
+    end
     local filepath = CONFIG.queues[queue_name]
     local f = io.open(filepath, "a")
     if f then
@@ -47,22 +55,30 @@ local function write_to_queue(queue_name, message)
 end
 
 local function evaluate_trigger(trigger)
-    if not trigger or not trigger.address then return false end
+    if not trigger or not trigger.address then
+        return false
+    end
     local raw_addr = ADDR[trigger.address]
-    if not raw_addr then return false end
+    if not raw_addr then
+        return false
+    end
 
-    local val    = read8(raw_addr)
+    local val = read8(raw_addr)
     local target = trigger.value
 
-    if trigger.operator == "eq"  then return val == target end
-    if trigger.operator == "neq" then return val ~= target end
+    if trigger.operator == "eq" then
+        return val == target
+    end
+    if trigger.operator == "neq" then
+        return val ~= target
+    end
     return false
 end
 
--- the six supported action primitives
+-- the supported action primitives
 local function execute_action(act, current_keys)
     local output_keys = current_keys
-    local btn_map     = CONFIG.buttons or {}
+    local btn_map = CONFIG.buttons or {}
 
     if act.action == "speak" then
         -- on_enter and on_exit only fire once so we just write immediately
@@ -71,18 +87,25 @@ local function execute_action(act, current_keys)
 
     elseif act.action == "monitor_hp" then
         -- only poll every 30 frames so we don't spam the queue file
-        if state.frame_count % 30 ~= 0 then return output_keys end
+        if state.frame_count % 30 ~= 0 then
+            return output_keys
+        end
 
-        local hp_addr  = ADDR[act.address]
+        local hp_addr = ADDR[act.address]
         local max_addr = ADDR[act.max_address]
-        if not hp_addr or not max_addr then return output_keys end
+        if not hp_addr or not max_addr then
+            return output_keys
+        end
 
         local current_hp = read16(hp_addr)
-        local max_hp     = read16(max_addr)
+        local max_hp = read16(max_addr)
 
         local id = act.address
         if not state.hp_monitor[id] then
-            state.hp_monitor[id] = { last_hp = -1, warning_given = false }
+            state.hp_monitor[id] = {
+                last_hp = -1,
+                warning_given = false
+            }
         end
         local store = state.hp_monitor[id]
 
@@ -102,16 +125,24 @@ local function execute_action(act, current_keys)
 
     elseif act.action == "decision_timer" then
         local menu_addr = ADDR[act.menu_address]
-        if not menu_addr then return output_keys end
+        if not menu_addr then
+            return output_keys
+        end
 
         local id = act.menu_address
         if not state.decision_timer[id] then
-            state.decision_timer[id] = { inactive_frames = 0 }
+            state.decision_timer[id] = {
+                inactive_frames = 0
+            }
         end
         local store = state.decision_timer[id]
 
-        -- 0x03FF catches directions, A, B, Select, and Start all at once
-        local is_moving = (bit.band(current_keys, 0x03FF) ~= 0)
+        -- which keys count as "active" and reset the timer.
+        -- the profile can override this with reset_keys; default is any button (0x03FF).
+        -- a cognitive profile can pass a tighter mask (e.g. only A + directions) so that
+        -- fidgeting or tremoring doesn't keep resetting the timer for users who need the pause.
+        local reset_mask = act.reset_keys or 0x03FF
+        local is_moving = (bit.band(current_keys, reset_mask) ~= 0)
         if is_moving then
             store.inactive_frames = 0
         else
@@ -129,18 +160,25 @@ local function execute_action(act, current_keys)
         return output_keys
 
     elseif act.action == "summarize_hp" then
-        if state.frame_count % 30 ~= 0 then return output_keys end
+        if state.frame_count % 30 ~= 0 then
+            return output_keys
+        end
 
         local p_addr = ADDR[act.player_address]
         local e_addr = ADDR[act.enemy_address]
-        if not p_addr or not e_addr then return output_keys end
+        if not p_addr or not e_addr then
+            return output_keys
+        end
 
         local p_hp = read16(p_addr)
         local e_hp = read16(e_addr)
 
         local id = act.player_address .. "_" .. act.enemy_address
         if not state.hp_summary[id] then
-            state.hp_summary[id] = { last_p = -1, last_e = -1 }
+            state.hp_summary[id] = {
+                last_p = -1,
+                last_e = -1
+            }
         end
         local store = state.hp_summary[id]
 
@@ -154,9 +192,9 @@ local function execute_action(act, current_keys)
 
     elseif act.action == "auto_run" then
         local run_btn_mask = btn_map[act.button] or 0x0002
-        local select_mask  = btn_map["SELECT"]   or 0x0004
+        local select_mask = btn_map["SELECT"] or 0x0004
 
-        local select_pressed     = (bit.band(current_keys, select_mask) ~= 0)
+        local select_pressed = (bit.band(current_keys, select_mask) ~= 0)
         local select_was_pressed = state.auto_run.select_was_pressed
 
         -- only toggle on a fresh press, not while held
@@ -165,21 +203,115 @@ local function execute_action(act, current_keys)
         end
         state.auto_run.select_was_pressed = select_pressed
 
-        if state.auto_run.toggle then
+        -- only inject the run button when the player is actually trying to move.
+        -- the profile passes only_when (a mask of the movement keys); if the player
+        -- isn't pressing any of them, we don't hold run — otherwise run/B would fire
+        -- while standing still or in menus, where B means cancel and fights the player.
+        -- defaults to "always inject" if the profile doesn't specify only_when.
+        local only_when = act.only_when
+        local should_run = true
+        if only_when then
+            should_run = (bit.band(current_keys, only_when) ~= 0)
+        end
+
+        if state.auto_run.toggle and should_run then
             output_keys = bit.bor(output_keys, run_btn_mask)
         end
+
         return output_keys
 
     elseif act.action == "dialogue_advance" then
+        -- hold the advance button and the script taps it for you, so a player who
+        -- can't mash repeatedly can still get through dialogue. but we wait a short
+        -- hold-delay first, so a normal single tap isn't multiplied into several presses
+        -- (which would skip past things a one-handed or tremor-affected user didn't mean to).
         local a_mask    = btn_map[act.button] or 0x0001
         local a_pressed = (bit.band(current_keys, a_mask) ~= 0)
-        if a_pressed then
-            if state.frame_count % 4 == 0 then
-                output_keys = bit.bor(output_keys, a_mask)
-            else
-                output_keys = bit.band(output_keys, bit.bnot(a_mask))
-            end
+
+        -- per-action storage to remember how long the button has been held
+        local id = act.button or "default"
+        if not state.dialogue_advance then state.dialogue_advance = {} end
+        if not state.dialogue_advance[id] then
+            state.dialogue_advance[id] = { held_frames = 0 }
         end
+        local store = state.dialogue_advance[id]
+
+        if a_pressed then
+            store.held_frames = store.held_frames + 1
+
+            -- wait this many frames of holding before auto-repeat kicks in.
+            -- profile can override with hold_delay; default 60 frames (about 1 second).
+            local hold_delay = act.hold_delay or 60
+            -- how often to pulse once auto-repeat is active. profile can override; default every 4 frames.
+            local interval   = act.repeat_interval or 4
+
+            if store.held_frames > hold_delay then
+                if (store.held_frames - hold_delay) % interval == 0 then
+                    output_keys = bit.bor(output_keys, a_mask)            -- press
+                else
+                    output_keys = bit.band(output_keys, bit.bnot(a_mask)) -- release between presses
+                end
+            end
+            -- before the delay is reached, we leave the button exactly as the player pressed it,
+            -- so a normal short tap behaves normally and isn't multiplied.
+        else
+            store.held_frames = 0   -- released, reset the counter
+        end
+
+        return output_keys
+
+    elseif act.action == "announce" then
+        -- read a value from memory and speak it whenever it changes.
+        -- if the profile gives a labels table, translate the value into a word.
+        -- if not, speak the raw number with an optional prefix and postfix.
+        local addr = ADDR[act.address]
+        if not addr then
+            return output_keys
+        end
+
+        local value = read16(addr)
+
+        -- per-announce storage so we remember the last value and only speak on change
+        local id = act.address
+        if not state.announce[id] then
+            state.announce[id] = {
+                last_value = -1
+            }
+        end
+        local store = state.announce[id]
+
+        if value ~= store.last_value then
+            local message
+            if act.labels then
+                -- labels mode: translate the value, or say "unknown" if it isn't in the table
+                message = act.labels[value] or ("unknown " .. value)
+            else
+                -- raw mode: just speak the number, wrapped in optional prefix/postfix
+                message = (act.prefix or "") .. value .. (act.postfix or "")
+            end
+
+            write_to_queue(act.queue, message)
+            store.last_value = value
+        end
+
+        return output_keys
+
+    elseif act.action == "clear_queue" then
+        -- wipe a queue file empty, looked up by name from the profile.
+        -- used for reduced-distraction mode so only one voice talks at a time.
+        if not CONFIG.queues or not CONFIG.queues[act.queue] then
+            return output_keys
+        end
+
+        local filepath = CONFIG.queues[act.queue]
+
+        -- opening in "w" mode truncates the file; writing "" is just explicit
+        local f = io.open(filepath, "w")
+        if f then
+            f:write("")
+            f:close()
+        end
+
         return output_keys
     end
 
@@ -188,17 +320,17 @@ local function execute_action(act, current_keys)
 end
 
 function core.init(addresses, states, config)
-    ADDR   = addresses
+    ADDR = addresses
     STATES = states
     CONFIG = config
 
     callbacks:add("frame", function()
         state.frame_count = state.frame_count + 1
-        local current_keys  = emu:getKeys()
+        local current_keys = emu:getKeys()
         local modified_keys = current_keys
 
         for state_name, state_def in pairs(STATES) do
-            local is_triggered  = evaluate_trigger(state_def.trigger)
+            local is_triggered = evaluate_trigger(state_def.trigger)
             local was_triggered = state.current_states[state_name] or false
 
             if is_triggered and not was_triggered then
@@ -218,10 +350,16 @@ function core.init(addresses, states, config)
                 end
 
                 -- wipe the per-state storage when a state goes inactive
-                -- so stale HP values don't carry over into the next session
-                state.hp_monitor    = {}
-                state.hp_summary    = {}
+                -- so stale values don't carry over into the next session.
+                -- this is a complete wipe, it assumes states are mutually
+                -- exclusive (at most one active at a time). correct for all three
+                -- current tracks. a true multi-state profile would need per-state cleanup instead
+                -- written as a known limitation
+                state.hp_monitor = {}
+                state.hp_summary = {}
                 state.decision_timer = {}
+                state.announce = {}
+                state.dialogue_advance = {}
             end
 
             if state.current_states[state_name] and state_def.while_active then
