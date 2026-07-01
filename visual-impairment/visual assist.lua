@@ -1,13 +1,12 @@
 --[[
-    visual_assist.lua
-    reads battle state from memory and writes text to a queue file
-    that speech_reader.py picks up and reads aloud
+    ARCHIVE / PROTOTYPE - NOT VERIFIED, NOT THE CURRENT DESIGN
 
-    for players who can't read the screen clearly
-    works by polling memory every 30 frames and announcing changes
-
-    addresses updated to confirmed values from live memory scanning
-    (the original addresses were wrong for this rom)
+    This is the old standalone visual script from before the engine existed.
+    It uses the old battle-state address (0x02024064) which turned out to be
+    wrong (it reads the same in and out of battle). The current visual track is
+    visual_profile.lua, built on accessibility_core with the verified battle_flag
+    address. This file is kept only as a reference. Do not load it expecting it
+    to work correctly.
 --]]
 
 -- set output_file to wherever speech_queue.txt lives on your machine

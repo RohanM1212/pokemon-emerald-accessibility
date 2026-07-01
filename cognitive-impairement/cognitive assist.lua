@@ -1,12 +1,12 @@
 --[[
-    cognitive_assist.lua
-    This is for players who get overwhelmed by too much text or fast menus.
-    Like when the screen flashes ten things at once and you miss what happened.
-    It writes short summaries to a file and pauses if you need time to think.
+    ARCHIVE / PROTOTYPE - NOT VERIFIED, NOT THE CURRENT DESIGN
 
-    Addresses are for the USA Pokemon Emerald ROM, game code BPEE.
-    If you are playing a European or Japanese version, these won't work.
-    You will have to look at the memory values yourself to match them up.
+    This is the old standalone cognitive script from before the engine existed.
+    It uses the old battle-state address (0x02024064) which turned out to be
+    wrong, and it includes features that were later cut (decision-pause timer)
+    or never verified (move/PP reminder). The current cognitive track is
+    cognitive_profile.lua, built on accessibility_core. This file is kept only
+    as a reference. Do not load it expecting it to work correctly.
 --]]
 
 local CONFIG = {

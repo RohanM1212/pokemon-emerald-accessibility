@@ -38,7 +38,7 @@ local addresses = {
 -- what to detect and what to do in each state
 local states = {
     in_battle = {
-        -- game_state reads 1 means we're in a battle
+        -- battle_flag reads 1 means we're in a battle
         trigger = { address = "battle_flag", operator = "eq", value = 1 },
 
         -- fires once when the battle starts

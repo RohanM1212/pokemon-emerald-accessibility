@@ -1,35 +1,14 @@
 --[[
-    Pokemon Emerald - One-Handed Accessibility Script
-    Part of: pokemon-emerald-accessibility
-    
-    WHO THIS IS FOR:
-    Players with motor impairments affecting one hand — including but not limited to
-    cerebral palsy, limb differences, repetitive strain injuries, and tremors.
-    
-    WHAT THIS DOES:
-    Pokemon Emerald requires simultaneous button presses that are difficult or
-    impossible for one-handed players. This script converts those into single
-    button toggles or automatic assists so the game is fully playable with one hand.
-    
-    FEATURES:
-    1. Auto-Run Toggle     — Press SELECT once to toggle running on/off (no need to hold B)
-    2. Soft Step Assist    — Automatically handles B+direction for ledge hopping
-    3. Battle Menu Slow    — Slows down battle menu inputs so precise timing isn't needed
-    4. A-Button Repeat     — Hold A to auto-advance dialogue without repeated tapping
-    
-    HOW TO USE:
-    1. Open mGBA and load Pokemon Emerald (US version)
-    2. Go to Tools > Scripting
-    3. Click Load Script and select this file
-    4. Edit config.lua to turn features on or off
-    
-    TESTED ON:
-    mGBA 0.10.x | Pokemon Emerald (US) ROM
+    ARCHIVE / PROTOTYPE - NOT VERIFIED, NOT THE CURRENT DESIGN
+
+    This is the old standalone one-handed script from before the engine existed.
+    It was never tested and its memory addresses are unverified. The real motor
+    track will be a thin profile (motor_profile.lua) built on accessibility_core,
+    like the visual and cognitive profiles. This file is kept only as a reference
+    for that future profile. Do not load this expecting it to work.
 --]]
 
--- ============================================================
--- CONFIG — change these to turn features on (true) or off (false)
--- ============================================================
+
 local CONFIG = {
     auto_run_toggle     = true,   -- SELECT toggles run mode on/off
     dialogue_repeat     = true,   -- hold A to auto-advance text
@@ -38,10 +17,7 @@ local CONFIG = {
     debug_overlay       = true,   -- shows current script state on screen
 }
 
--- ============================================================
--- MEMORY ADDRESSES — Pokemon Emerald US (game code: BPEE)
--- These tell us what is happening in the game at any moment
--- ============================================================
+
 local ADDR = {
     -- Game state: 0 = overworld, 2 = battle, 5 = menu
     game_state      = 0x02030004,
@@ -53,10 +29,7 @@ local ADDR = {
     player_state    = 0x020370A4,
 }
 
--- ============================================================
--- BUTTON CONSTANTS
--- mGBA uses these key names for input injection
--- ============================================================
+
 local KEYS = {
     A       = 1,
     B       = 2,
@@ -70,9 +43,7 @@ local KEYS = {
     L       = 512,
 }
 
--- ============================================================
--- STATE — tracks what the script is doing right now
--- ============================================================
+
 local state = {
     run_mode_on         = false,  -- is auto-run currently toggled on?
     select_held         = false,  -- was SELECT pressed last frame?
@@ -81,9 +52,7 @@ local state = {
     frame_count         = 0,      -- total frames elapsed
 }
 
--- ============================================================
--- UTILITY FUNCTIONS
--- ============================================================
+
 
 -- Read a single byte from game memory
 local function read_byte(address)
@@ -120,12 +89,7 @@ local function has_running_shoes()
     return read_byte(ADDR.has_running_shoes) == 1
 end
 
--- ============================================================
--- FEATURE 1: AUTO-RUN TOGGLE
--- Normal: player must hold B to run
--- Accessibility: press SELECT once to toggle run on/off
--- When run mode is on, B is automatically held for the player
--- ============================================================
+
 local function handle_auto_run()
     if not CONFIG.auto_run_toggle then return end
     if not has_running_shoes() then return end
@@ -161,12 +125,7 @@ local function handle_auto_run()
     end
 end
 
--- ============================================================
--- FEATURE 2: DIALOGUE AUTO-ADVANCE
--- Normal: player must tap A repeatedly to advance all text
--- Accessibility: hold A and text advances automatically at set intervals
--- This helps players with low dexterity or tremors
--- ============================================================
+
 local function handle_dialogue_repeat()
     if not CONFIG.dialogue_repeat then return end
     if not dialogue_open() then
@@ -196,11 +155,7 @@ local function handle_dialogue_repeat()
     end
 end
 
--- ============================================================
--- FEATURE 3: DEBUG OVERLAY
--- Shows current script state in the mGBA console
--- Useful for testing and for users to confirm the script is working
--- ============================================================
+
 local function handle_debug_overlay()
     if not CONFIG.debug_overlay then return end
 
@@ -218,11 +173,7 @@ local function handle_debug_overlay()
     end
 end
 
--- ============================================================
--- MAIN LOOP
--- mGBA calls this function once per frame (60 times per second)
--- All features run here in sequence
--- ============================================================
+
 callbacks:add("frame", function()
     state.frame_count = state.frame_count + 1
 
@@ -231,10 +182,7 @@ callbacks:add("frame", function()
     handle_debug_overlay()
 end)
 
--- ============================================================
--- STARTUP MESSAGE
--- ============================================================
-console:log("==============================================")
+
 console:log("Pokemon Emerald - One-Handed Accessibility")
 console:log("Script loaded successfully.")
 console:log("Features active:")
@@ -243,4 +191,4 @@ if CONFIG.dialogue_repeat     then console:log("  [ON]  Dialogue Auto-Advance (h
 if CONFIG.battle_input_slow   then console:log("  [ON]  Battle Input Buffer") end
 if CONFIG.debug_overlay       then console:log("  [ON]  Debug Overlay (check console for status)") end
 console:log("Edit CONFIG at top of script to change settings.")
-console:log("==============================================")
+
